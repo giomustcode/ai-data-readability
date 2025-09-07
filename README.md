@@ -5,7 +5,7 @@
 Este repositório contém os códigos, planilhas e resultados utilizados no Trabalho de Conclusão de Curso (TCC) que analisou a **acessibilidade e segurança da informação** de textos gerados por redes neurais generativas (RNGs) em comparação com documentos da Organização Mundial da Saúde (OMS) sobre exposição ao asbesto (amianto).
 
 #### Objetivo 🔍
-O objetivo do trabalho foi avaliar a legibilidade de textos em saúde ocupacional por meio das métricas Flesch Reading Ease (FRE) e Flesch-Kincaid Grade Level (FKG). A análise foi conduzida em dois ambientes distintos (Python e R) para verificar a robustez dos resultados e identificar limitações técnicas nas bibliotecas de cada linguagem.
+O objetivo do trabalho foi avaliar a legibilidade e a similaridade de textos em saúde ocupacional por meio das métricas Flesch Reading Ease (FRE) e Flesch-Kincaid Grade Level (FKG); similaridade do cosseno para avaliar a similaridade temática, distância de Levenshtein para medir a similaridade textual, e o coeficiente de similaridade de Jaccard para analisar a sobreposição de conjuntos de palavras-chave. A análise foi conduzida em dois ambientes distintos (Python e R) para verificar a robustez dos resultados e identificar limitações técnicas nas bibliotecas de cada linguagem.
 
 #### Motivação e Relevância 
 A escolha do tema foi principalmente feita por conta do constante crescimento de popularidade das fontes de IA como informação. 
@@ -21,7 +21,7 @@ Esta, inclusive, foi a motivação das ADIs 3406 e 3470 do STF no Brasil, tema d
 [# Amianto em Goiás: entenda a disputa jurídica](https://g1.globo.com/go/goias/noticia/2020/11/23/amianto-em-goias-entenda-a-disputa-juridica.ghtml) (2020) <br>
 [# Saúde ou emprego? O dilema do amianto, que fez Goiás desafiar STF](https://www.bbc.com/portuguese/brasil-49589925) (2019) <br>
 
-###### Qualidade e acessibilidade de informações provenientes de LLMs (Science Direct):
+###### Qualidade e acessibilidade de informações provenientes de LLMs (Wiley, Science Direct):
 [# Readability of Pediatric Otolaryngology Information: Comparing AI-Generated Content With Google Search Results](https://aao-hnsfjournals.onlinelibrary.wiley.com/doi/abs/10.1002/ohn.70011) *"ChatGPT4o-generated patient education materials are generally more difficult to read than Google-sourced content, especially for less complex conditions. **Given the importance of readability in patient education, AI-generated materials may require further refinement to improve accessibility without compromising accuracy**."* (2025) <br>
 [# Evaluating the Quality and Readability of AI-Generated Ophthalmic Surgery Education: A Four Model Comparison](https://www.sciencedirect.com/science/article/pii/S2773160X25000212) (2025) <br>
 [# A comparison of quality and readability of Artificial Intelligence chatbots in triage for head and neck cancer](https://www.sciencedirect.com/science/article/pii/S0196070925001139) (2025) <br>
@@ -42,6 +42,7 @@ projeto_tcc/
 │   │   ├── 01_main_planilha.py           # leitura da planilha e pré-processamento
 │   │   ├── 02_heatmap_readingease.py     # geração de heatmap FRE
 │   │   ├── 03_heatmap_grade.py           # geração de heatmap FKG
+│   │   ├── 04_similarity.py              # analise similaridade
 │   │   ├── heatmap_flesch_reading_Py.png # gráfico gerado em Python (FRE)
 │   │   └── heatmap_kincaid_grade_Py.png  # gráfico gerado em Python (FKG)
 │   │
@@ -52,6 +53,15 @@ projeto_tcc/
 │       ├── 03_heatmap_kincaid.R          # geração de heatmap FKG
 │       ├── heatmap_flesch_reading_R.png  # gráfico gerado em R (FRE)
 │       └── heatmap_kincaid_grade_R.png   # gráfico gerado em R (FKG)
+│
+└── resultados/
+    ├── figuras/
+    │   ├── heatmap_cosine_bow.png        # gráfico gerado em Python (cos)
+    │   ├── heatmap_jaccard_tokens.png    # gráfico gerado em Python (jaccard)
+    │   └── heatmap_levenshtein_sim.png   # gráfico gerado em Python (levenshtein)
+    │
+    └── tabelas/
+        └── similaridades_OMS_vs_RNGs.xlsx # planilha com resultados númericos (similaridade)
 
 ```
 
@@ -79,8 +89,9 @@ Colocar a planilha respostas_completas.xlsx na pasta dados/.
 
 Executar:
 python scripts/python/01_main_planilha.py <br>
-python scripts/python/03_heatmap_grade.py <br>
 python scripts/python/02_heatmap_readingease.py <br>
+python scripts/python/03_heatmap_grade.py <br>
+python scripts/python/04_similarity.py <br>
 
 Os resultados serão salvos em planilhas .xlsx e gráficos .png.
 
@@ -88,16 +99,22 @@ Os resultados serão salvos em planilhas .xlsx e gráficos .png.
 
 Executar:
 source("scripts/r/01_metricas_readability.R") <br>
-source("scripts/r/03_heatmap_kincaid.R") <br>
 source("scripts/r/02_heatmap_readingease.R") <br>
+source("scripts/r/03_heatmap_kincaid.R") <br>
 
 Os resultados serão salvos em planilhas .xlsx e gráficos .png.
 
 #### Resultados
 
-Heatmaps comparativos da legibilidade dos textos por pergunta e fonte (OMS vs RNGs).
+Heatmaps comparativos da legibilidade dos textos por pergunta e fonte (OMS vs RNGs) e legibilidade (um para cada método).
 Interpretação dos resultados utilizada no TCC.
-###### OBS.: Os PNGs (heatmap_flesch_reading_*, heatmap_kincaid_grade_*) já estão incluídos no repositório como exemplos de saída, para facilitar a leitura de quem não quiser rodar o código.
+###### OBS.: Os PNGs (heatmap_flesch_reading_*, heatmap_kincaid_grade_*, heatmap_cosine_bow, heatmap_jaccard_tokens e heatmap_levenshtein_sim) já estão incluídos no repositório como exemplos de saída, para facilitar a leitura de quem não quiser rodar o código.
+
+#### Breve Conclusão do Trabalho Acadêmico
+
+O estudo mostrou que, em conteúdos sobre exposição ao asbesto, respostas geradas por modelos de IA tendem a apresentar maior complexidade linguística do que os documentos de referência da OMS, o que pode comprometer a acessibilidade e a segurança informacional. <br>
+A combinação de métricas de legibilidade (FRE, FKG) e de similaridade (cosseno, Jaccard, Levenshtein) evidenciou que nem sempre textos “tematicamente corretos” são claros ou terminologicamente alinhados. <br>
+As análises em Python e R reforçaram as tendências gerais, apesar de pequenas diferenças técnicas de contagem silábica entre as linguagens. Conclui-se que materiais em saúde ocupacional apoiados por IA devem passar por _governança clara, controle de qualidade automatizado e validação humana especializada, para assegurar clareza e fidelidade às diretrizes oficiais_. Como agenda de continuidade, recomenda-se _explorar métricas adicionais, avaliar impacto em diferentes públicos e desenvolver rotinas de simplificação automática de linguagem_.
 
 #### Limitações
 
